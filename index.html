@@ -181,21 +181,26 @@
 
     <script>
         // Note definitions for treble and bass clef
+        // Staff lines are at y: 100, 140, 180, 220, 260 (bottom to top: line 1, 2, 3, 4, 5)
         const notesData = {
             treble: {
-                'C4': { name: 'До', position: { x: 200, y: 240 }, ledger: true, ledgerY: 240 },
-                'D4': { name: 'Ре', position: { x: 200, y: 220 }, ledger: false },
-                'E4': { name: 'Ми', position: { x: 200, y: 200 }, ledger: false },
-                'F4': { name: 'Фа', position: { x: 200, y: 180 }, ledger: false },
-                'G4': { name: 'Соль', position: { x: 200, y: 160 }, ledger: false },
-                'A4': { name: 'Ля', position: { x: 200, y: 140 }, ledger: false },
-                'B4': { name: 'Си', position: { x: 200, y: 120 }, ledger: false },
-                'C5': { name: 'До', position: { x: 200, y: 100 }, ledger: false },
-                'D5': { name: 'Ре', position: { x: 200, y: 80 }, ledger: false },
-                'E5': { name: 'Ми', position: { x: 200, y: 60 }, ledger: false }
+                // Lines: E4(1st), G4(2nd), B4(3rd), D5(4th), F5(5th)
+                // Spaces: F4, A4, C5, E5
+                'C4': { name: 'До', position: { x: 200, y: 280 }, ledger: true, ledgerY: 280 },
+                'D4': { name: 'Ре', position: { x: 200, y: 260 }, ledger: false },
+                'E4': { name: 'Ми', position: { x: 200, y: 240 }, ledger: false },
+                'F4': { name: 'Фа', position: { x: 200, y: 220 }, ledger: false },
+                'G4': { name: 'Соль', position: { x: 200, y: 200 }, ledger: false },
+                'A4': { name: 'Ля', position: { x: 200, y: 180 }, ledger: false },
+                'B4': { name: 'Си', position: { x: 200, y: 160 }, ledger: false },
+                'C5': { name: 'До', position: { x: 200, y: 140 }, ledger: false },
+                'D5': { name: 'Ре', position: { x: 200, y: 120 }, ledger: false },
+                'E5': { name: 'Ми', position: { x: 200, y: 100 }, ledger: false }
             },
             bass: {
-                'G2': { name: 'Соль', position: { x: 200, y: 240 }, ledger: true, ledgerY: 240 },
+                // Lines: G2(1st), B2(2nd), D3(3rd), F3(4th), A3(5th)
+                // Spaces: A2, C3, E3, G3
+                'G2': { name: 'Соль', position: { x: 200, y: 240 }, ledger: false },
                 'A2': { name: 'Ля', position: { x: 200, y: 220 }, ledger: false },
                 'B2': { name: 'Си', position: { x: 200, y: 200 }, ledger: false },
                 'C3': { name: 'До', position: { x: 200, y: 180 }, ledger: false },
@@ -203,8 +208,8 @@
                 'E3': { name: 'Ми', position: { x: 200, y: 140 }, ledger: false },
                 'F3': { name: 'Фа', position: { x: 200, y: 120 }, ledger: false },
                 'G3': { name: 'Соль', position: { x: 200, y: 100 }, ledger: false },
-                'A3': { name: 'Ля', position: { x: 200, y: 80 }, ledger: false },
-                'B3': { name: 'Си', position: { x: 200, y: 60 }, ledger: false }
+                'A3': { name: 'Ля', position: { x: 200, y: 80 }, ledger: true, ledgerY: 80 },
+                'B3': { name: 'Си', position: { x: 200, y: 60 }, ledger: true, ledgerY: 60 }
             }
         };
 
