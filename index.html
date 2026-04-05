@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Нотный тренажер</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .controls label {
+            margin-right: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .controls select {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .score-container {
+            background: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .score {
+            font-size: 24px;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .staff-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        #staff {
+            width: 400px;
+            height: 300px;
+        }
+
+        .notes-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .notes-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .note-btn {
+            width: 60px;
+            height: 60px;
+            font-size: 20px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .note-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.3);
+        }
+
+        .note-btn:active {
+            transform: translateY(0);
+        }
+
+        .note-btn.correct {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            animation: pulse 0.5s ease;
+        }
+
+        .note-btn.wrong {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .message {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            min-height: 27px;
+        }
+
+        .message.success {
+            color: #11998e;
+        }
+
+        .message.error {
+            color: #eb3349;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎵 Нотный тренажер 🎵</h1>
+    
+    <div class="controls">
+        <label for="clef">Выберите ключ:</label>
+        <select id="clef">
+            <option value="treble">Скрипичный ключ (🎼)</option>
+            <option value="bass">Басовый ключ (𝄢)</option>
+        </select>
+    </div>
+
+    <div class="score-container">
+        <span class="score">Счёт: <span id="score">0</span></span>
+    </div>
+
+    <div class="staff-container">
+        <svg id="staff" viewBox="0 0 400 300">
+            <!-- Staff lines and clef will be drawn by JavaScript -->
+        </svg>
+    </div>
+
+    <div class="notes-container">
+        <div class="notes-row" id="noteButtons"></div>
+        <div class="message" id="message"></div>
+    </div>
+
+    <script>
+        // Note definitions for treble and bass clef
+        const notesData = {
+            treble: {
+                'C4': { name: 'До', position: { x: 200, y: 220 }, ledger: true, ledgerY: 220 },
+                'D4': { name: 'Ре', position: { x: 200, y: 200 }, ledger: false },
+                'E4': { name: 'Ми', position: { x: 200, y: 180 }, ledger: false },
+                'F4': { name: 'Фа', position: { x: 200, y: 160 }, ledger: false },
+                'G4': { name: 'Соль', position: { x: 200, y: 140 }, ledger: false },
+                'A4': { name: 'Ля', position: { x: 200, y: 120 }, ledger: false },
+                'B4': { name: 'Си', position: { x: 200, y: 100 }, ledger: false },
+                'C5': { name: 'До', position: { x: 200, y: 80 }, ledger: false },
+                'D5': { name: 'Ре', position: { x: 200, y: 60 }, ledger: false },
+                'E5': { name: 'Ми', position: { x: 200, y: 40 }, ledger: false }
+            },
+            bass: {
+                'E2': { name: 'Ми', position: { x: 200, y: 220 }, ledger: true, ledgerY: 220 },
+                'F2': { name: 'Фа', position: { x: 200, y: 200 }, ledger: false },
+                'G2': { name: 'Соль', position: { x: 200, y: 180 }, ledger: false },
+                'A2': { name: 'Ля', position: { x: 200, y: 160 }, ledger: false },
+                'B2': { name: 'Си', position: { x: 200, y: 140 }, ledger: false },
+                'C3': { name: 'До', position: { x: 200, y: 120 }, ledger: false },
+                'D3': { name: 'Ре', position: { x: 200, y: 100 }, ledger: false },
+                'E3': { name: 'Ми', position: { x: 200, y: 80 }, ledger: false },
+                'F3': { name: 'Фа', position: { x: 200, y: 60 }, ledger: false },
+                'G3': { name: 'Соль', position: { x: 200, y: 40 }, ledger: true, ledgerY: 40 }
+            }
+        };
+
+        let currentClef = 'treble';
+        let currentNote = null;
+        let score = 0;
+
+        // Initialize the game
+        function init() {
+            createNoteButtons();
+            setupEventListeners();
+            generateNewNote();
+        }
+
+        // Create note buttons
+        function createNoteButtons() {
+            const container = document.getElementById('noteButtons');
+            container.innerHTML = '';
+            
+            const notes = ['До', 'Ре', 'Ми', 'Фа', 'Соль', 'Ля', 'Си'];
+            notes.forEach(note => {
+                const btn = document.createElement('button');
+                btn.className = 'note-btn';
+                btn.textContent = note;
+                btn.dataset.note = note;
+                container.appendChild(btn);
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('clef').addEventListener('change', (e) => {
+                currentClef = e.target.value;
+                score = 0;
+                updateScore();
+                generateNewNote();
+            });
+
+            document.querySelectorAll('.note-btn').forEach(btn => {
+                btn.addEventListener('click', () => handleNoteClick(btn));
+            });
+        }
+
+        // Draw the staff
+        function drawStaff() {
+            const svg = document.getElementById('staff');
+            let content = '';
+
+            // Draw staff lines
+            for (let i = 0; i < 5; i++) {
+                const y = 100 + i * 40;
+                content += `<line x1="50" y1="${y}" x2="350" y2="${y}" stroke="#333" stroke-width="2"/>`;
+            }
+
+            // Draw clef
+            if (currentClef === 'treble') {
+                content += `<text x="80" y="180" font-size="80" font-family="Arial">🎼</text>`;
+            } else {
+                content += `<text x="70" y="185" font-size="70" font-family="Arial">𝄢</text>`;
+            }
+
+            svg.innerHTML = content;
+        }
+
+        // Draw a note on the staff
+        function drawNote(noteKey) {
+            const note = notesData[currentClef][noteKey];
+            const svg = document.getElementById('staff');
+            
+            // Draw ledger line if needed
+            if (note.ledger) {
+                const ledgerLine = `<line x1="170" y1="${note.ledgerY}" x2="230" y2="${note.ledgerY}" stroke="#333" stroke-width="2"/>`;
+                svg.innerHTML += ledgerLine;
+            }
+
+            // Draw note head
+            const noteHead = `<ellipse cx="${note.position.x}" cy="${note.position.y}" rx="15" ry="12" fill="#333" transform="rotate(-15 ${note.position.x} ${note.position.y})"/>`;
+            svg.innerHTML += noteHead;
+        }
+
+        // Generate a new random note
+        function generateNewNote() {
+            const notes = Object.keys(notesData[currentClef]);
+            currentNote = notes[Math.floor(Math.random() * notes.length)];
+            
+            drawStaff();
+            drawNote(currentNote);
+            clearMessage();
+        }
+
+        // Handle note button click
+        function handleNoteClick(btn) {
+            const selectedNote = btn.dataset.note;
+            const correctNoteName = notesData[currentClef][currentNote].name;
+
+            // Remove previous animations
+            document.querySelectorAll('.note-btn').forEach(b => {
+                b.classList.remove('correct', 'wrong');
+            });
+
+            if (selectedNote === correctNoteName) {
+                // Correct answer
+                btn.classList.add('correct');
+                score++;
+                updateScore();
+                showMessage('Правильно! 🎉', 'success');
+                
+                setTimeout(() => {
+                    generateNewNote();
+                }, 500);
+            } else {
+                // Wrong answer
+                btn.classList.add('wrong');
+                score = 0;
+                updateScore();
+                showMessage('Неправильно! Счёт сброшен.', 'error');
+            }
+        }
+
+        // Update score display
+        function updateScore() {
+            document.getElementById('score').textContent = score;
+        }
+
+        // Show message
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `message ${type}`;
+        }
+
+        // Clear message
+        function clearMessage() {
+            const msg = document.getElementById('message');
+            msg.textContent = '';
+            msg.className = 'message';
+        }
+
+        // Start the game
+        init();
+    </script>
+</body>
+</html>
